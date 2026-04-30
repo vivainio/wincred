@@ -99,6 +99,13 @@ fn from_pwstr(p: windows::core::PWSTR) -> String {
 }
 
 #[cfg(windows)]
+fn strip_legacy_prefix(s: String) -> String {
+    s.strip_prefix("LegacyGeneric:target=")
+        .map(str::to_owned)
+        .unwrap_or(s)
+}
+
+#[cfg(windows)]
 fn get(target: &str, json: bool) -> windows::core::Result<u8> {
     use windows::core::PCWSTR;
     use windows::Win32::Foundation::ERROR_NOT_FOUND;
@@ -119,7 +126,7 @@ fn get(target: &str, json: bool) -> windows::core::Result<u8> {
         unsafe { std::slice::from_raw_parts(cred.CredentialBlob, cred.CredentialBlobSize as usize) };
     let secret = decode_blob(blob);
     let username = from_pwstr(cred.UserName);
-    let target_out = from_pwstr(cred.TargetName);
+    let target_out = strip_legacy_prefix(from_pwstr(cred.TargetName));
 
     if json {
         let out = CredOut {
@@ -236,7 +243,7 @@ fn list(prefix: Option<&str>, json: bool) -> windows::core::Result<u8> {
             continue;
         }
         entries.push(ListEntry {
-            target: from_pwstr(c.TargetName),
+            target: strip_legacy_prefix(from_pwstr(c.TargetName)),
             username: from_pwstr(c.UserName),
         });
     }
