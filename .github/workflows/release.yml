@@ -1,0 +1,33 @@
+name: release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release
+      - name: Package
+        shell: pwsh
+        run: |
+          $ver = "${{ github.event.release.tag_name }}"
+          $name = "wincred-$ver-x86_64-pc-windows-msvc"
+          New-Item -ItemType Directory -Path $name | Out-Null
+          Copy-Item target/release/wincred.exe $name/
+          Copy-Item LICENSE $name/
+          Copy-Item README.md $name/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path $name -DestinationPath "$name.zip"
+          (Get-FileHash "$name.zip" -Algorithm SHA256).Hash | Out-File "$name.zip.sha256" -Encoding ascii
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            wincred-*.zip
+            wincred-*.zip.sha256
