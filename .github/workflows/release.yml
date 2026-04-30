@@ -26,8 +26,12 @@ jobs:
           Copy-Item README.md $name/ -ErrorAction SilentlyContinue
           Compress-Archive -Path $name -DestinationPath "$name.zip"
           (Get-FileHash "$name.zip" -Algorithm SHA256).Hash | Out-File "$name.zip.sha256" -Encoding ascii
+          Copy-Item target/release/wincred.exe wincred.exe
+          (Get-FileHash wincred.exe -Algorithm SHA256).Hash | Out-File wincred.exe.sha256 -Encoding ascii
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             wincred-*.zip
             wincred-*.zip.sha256
+            wincred.exe
+            wincred.exe.sha256
