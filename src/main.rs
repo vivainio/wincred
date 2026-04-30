@@ -4,7 +4,7 @@ use std::io::{self, Read};
 use std::process::ExitCode;
 
 #[derive(Parser)]
-#[command(version, about = "Windows Credential Manager CLI (WSL-friendly)")]
+#[command(version = env!("BUILD_VERSION"), about = "Windows Credential Manager CLI (WSL-friendly)")]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
