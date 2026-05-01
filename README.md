@@ -25,6 +25,14 @@ the same entry `wincred get` reads from WSL, no duplicate storage.
 Download `wincred.exe` from the [Releases](../../releases) page and put it on your
 Windows `PATH`. From WSL, it's then directly callable as `wincred.exe`.
 
+The fastest way, from PowerShell on the Windows side — this lands the binary
+in `%USERPROFILE%\.local\bin`, which is on PATH if you have [uv](https://docs.astral.sh/uv/)
+installed:
+
+```powershell
+iwr https://github.com/vivainio/wincred/releases/latest/download/wincred.exe -OutFile $HOME\.local\bin\wincred.exe
+```
+
 Or build from source:
 
 ```sh
@@ -63,8 +71,7 @@ Round-trip times measured from WSL2 (Windows 11):
 
 Most of the 60 ms is WSL↔Windows interop and PE loader startup; the underlying
 `CredReadW` call is microseconds. The native binary is ~6× faster than equivalent
-PowerShell `Add-Type` + `CredRead` P/Invoke. Fine for occasional credential fetch,
-not for hot loops — if you need that, keep a long-lived helper process instead.
+PowerShell `Add-Type` + `CredRead` P/Invoke.
 
 ## Limitations
 
