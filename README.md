@@ -8,6 +8,18 @@ WSL has no native access to the Windows credential store. `wincred.exe` is a tin
 Windows binary (under 500 KB) you can call from Linux side via WSL's Windows interop
 to read, write, list, and delete generic credentials owned by the current Windows user.
 
+### Why not just use a Linux keyring under WSL?
+
+You can install GNOME Keyring or KWallet inside Ubuntu WSL, but the UX is
+awkward: each unlock pops a GUI dialog asking for a separate master password,
+which interrupts CLI flows and breaks scripts running in headless terminals.
+
+Windows Credential Manager avoids both: the vault is unlocked by the Windows
+login the user already authenticated with, and there's no GUI prompt to
+interrupt anything. As a bonus, entries are shared with Windows-side tools —
+a token written by `git-credential-manager` or Python `keyring` on Windows is
+the same entry `wincred get` reads from WSL, no duplicate storage.
+
 ## Install
 
 Download `wincred.exe` from the [Releases](../../releases) page and put it on your
