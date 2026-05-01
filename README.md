@@ -39,6 +39,21 @@ TOKEN=$(wincred.exe get 'github:my-pat' | tr -d '\r')
 
 Strip `\r` because Windows binaries emit CRLF line endings.
 
+## Performance
+
+Round-trip times measured from WSL2 (Windows 11):
+
+| Operation | Time |
+| --- | --- |
+| Single `wincred.exe get` | ~60 ms |
+| 10 sequential gets | ~570 ms (~57 ms each) |
+| PowerShell `-NoProfile` no-op (baseline) | ~345 ms |
+
+Most of the 60 ms is WSL↔Windows interop and PE loader startup; the underlying
+`CredReadW` call is microseconds. The native binary is ~6× faster than equivalent
+PowerShell `Add-Type` + `CredRead` P/Invoke. Fine for occasional credential fetch,
+not for hot loops — if you need that, keep a long-lived helper process instead.
+
 ## Limitations
 
 - Only handles `CRED_TYPE_GENERIC` credentials. Domain credentials are not exposed
