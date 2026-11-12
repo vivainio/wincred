@@ -4,6 +4,7 @@ version = "0.0.0"
 edition = "2021"
 description = "CLI for the Windows Credential Manager, callable from WSL"
 license = "MIT"
+authors = ["Ville Vainio"]
 repository = "https://github.com/vivainio/wincred"
 
 [dependencies]
@@ -23,3 +24,7 @@ strip = true
 lto = true
 codegen-units = 1
 opt-level = "z"
+
+# embeds the publisher metadata (File Properties -> Details) in the Windows exe
+[build-dependencies]
+winresource = "0.1"
